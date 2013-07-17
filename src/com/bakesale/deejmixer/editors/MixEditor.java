@@ -9,12 +9,17 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * @author hbl2686
  *
  */
 public class MixEditor extends EditorPart {
+	private Table table;
 
 	/**
 	 * 
@@ -68,6 +73,32 @@ public class MixEditor extends EditorPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		
+		ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
+		
+		table = new Table(scrolledComposite, SWT.BORDER | SWT.FULL_SELECTION);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		
+		TableColumn tblclmnSongName = new TableColumn(table, SWT.NONE);
+		tblclmnSongName.setWidth(100);
+		tblclmnSongName.setText("Song");
+		
+		TableColumn tblclmnArtist = new TableColumn(table, SWT.NONE);
+		tblclmnArtist.setWidth(100);
+		tblclmnArtist.setText("Artist");
+		
+		TableColumn tblclmnLength = new TableColumn(table, SWT.NONE);
+		tblclmnLength.setWidth(100);
+		tblclmnLength.setText("Length");
+		
+		TableColumn tblclmnCumulativeTime = new TableColumn(table, SWT.NONE);
+		tblclmnCumulativeTime.setWidth(100);
+		tblclmnCumulativeTime.setText("Cumulative Time");
+		scrolledComposite.setContent(table);
+		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
