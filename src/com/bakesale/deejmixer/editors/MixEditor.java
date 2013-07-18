@@ -50,6 +50,8 @@ public class MixEditor extends EditorPart {
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 
+		setSite(site);
+		setInput(input);
 	}
 
 	/* (non-Javadoc)
