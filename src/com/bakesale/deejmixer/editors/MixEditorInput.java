@@ -6,6 +6,15 @@ import org.eclipse.ui.IPersistableElement;
 
 public class MixEditorInput implements IEditorInput {
 
+    private final int id;
+
+    public MixEditorInput(int id) {
+    	this.id = id;
+    }
+    public int getId() {
+    	return id;
+    }
+    
 	@Override
 	public Object getAdapter(Class adapter) {
 		// TODO Auto-generated method stub
@@ -15,7 +24,7 @@ public class MixEditorInput implements IEditorInput {
 	@Override
 	public boolean exists() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -27,7 +36,7 @@ public class MixEditorInput implements IEditorInput {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Mix Input";
+		return String.valueOf(id);
 	}
 
 	@Override

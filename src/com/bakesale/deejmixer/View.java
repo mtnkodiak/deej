@@ -1,5 +1,21 @@
 package com.bakesale.deejmixer;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -13,6 +29,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.farng.mp3.MP3File;
+import org.farng.mp3.TagException;
+
 
 public class View extends ViewPart {
 	public View() {
@@ -20,6 +39,12 @@ public class View extends ViewPart {
 	public static final String ID = "deejmixer.view";
 
 	private TableViewer viewer;
+
+	private TableColumn tblclmnTrackName;
+
+	private TableColumn tblclmnLength;
+
+	private TableColumn tblclmnRunningTime;
 
 	/**
 	 * The content provider class is responsible for providing objects to the
@@ -36,17 +61,81 @@ public class View extends ViewPart {
 		}
 
 		public Object[] getElements(Object parent) {
-			if (parent instanceof Object[]) {
-				return (Object[]) parent;
+			UserPrefs userPrefs = UserPrefs.getInstance();
+			String libraryDir = userPrefs.getLibraryLocation();
+
+		    Path p = Paths.get(libraryDir);
+		    final List<Path> fileArray = new ArrayList<Path>();
+		    SimpleFileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
+		      @Override
+		      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+		          throws IOException {
+		        System.out.println(file);
+		        fileArray.add(file);
+		        return FileVisitResult.CONTINUE;
+		      }
+		    };
+		    
+			try {
+				Files.walkFileTree(p, fv);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-	        return new Object[0];
+
+			// now we have a list of paths. Make them into MP3Files.
+		    List<MP3File> mp3Files = new ArrayList<>();
+		    for (Path path : fileArray) {
+		    	MP3File mp3File = null;
+				try {
+					mp3File = new MP3File(path.toFile());
+				} catch (IOException | TagException e) {
+					System.out.println("trouble parsing " + path.toString());
+					e.printStackTrace();
+					continue; //skip it!
+				}
+				mp3Files.add(mp3File);
+		    }
+
+		    return mp3Files.toArray();
+			
 		}
 	}
 
 	class ViewLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 		public String getColumnText(Object obj, int index) {
-			return getText(obj);
+			MP3File mp3File = (MP3File)obj;
+			if (mp3File.hasID3v2Tag()) {
+				switch (index) {
+				case 0: //artist
+					return mp3File.getID3v2Tag().getLeadArtist();
+				case 1: //song title
+					return mp3File.getID3v2Tag().getSongTitle();
+				case 2: //duration
+					File file = mp3File.getMp3file();
+					AudioFileFormat audioFileFormat = null;
+					try {
+						audioFileFormat = AudioSystem.getAudioFileFormat(file);
+					} catch (UnsupportedAudioFileException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						break;
+					}
+					// get all properties
+					Map<String, Object> properties = audioFileFormat.properties();
+					// duration is in microseconds
+					Long duration = (Long) properties.get("duration");
+
+					return duration.toString();
+				default:
+					return "UNKNOWN";
+				}
+			} else  if (mp3File.hasID3v1Tag()){
+				return mp3File.getID3v1Tag().getArtist();
+			} else {
+				return "WTF";
+			}
+			return ".";
 		}
 
 		public Image getColumnImage(Object obj, int index) {
@@ -66,26 +155,27 @@ public class View extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL);
+
 		Table table = viewer.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
-		TableColumn tblclmnTrackName = new TableColumn(table, SWT.NONE);
+		tblclmnTrackName = new TableColumn(table, SWT.NONE);
 		tblclmnTrackName.setWidth(100);
 		tblclmnTrackName.setText("Name");
 		
-		TableColumn tblclmnLength = new TableColumn(table, SWT.NONE);
+		tblclmnLength = new TableColumn(table, SWT.NONE);
 		tblclmnLength.setWidth(354);
 		tblclmnLength.setText("Length");
 		
-		TableColumn tblclmnRunningTime = new TableColumn(table, SWT.NONE);
+		tblclmnRunningTime = new TableColumn(table, SWT.NONE);
 		tblclmnRunningTime.setWidth(100);
 		tblclmnRunningTime.setText("Running Time");
 		
 		viewer.setContentProvider(new ViewContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
 		// Provide the input to the ContentProvider
-		viewer.setInput(new String[] {"One", "Two", "Three"});
+		viewer.setInput(new String("One"));
 	}
 
 	/**

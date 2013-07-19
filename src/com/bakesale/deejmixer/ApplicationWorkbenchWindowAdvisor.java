@@ -34,18 +34,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public void postWindowOpen() {
 		super.postWindowOpen();
-		
-		IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
-				IEditorInput editorInput = new MixEditorInput();
-				try {
-					page.openEditor(editorInput, "com.bakesale.deejmixer.editors.MixEditor", true);
-				} catch (PartInitException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
+		IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+		IEditorInput editorInput = new MixEditorInput(1);
+		try {
+			page.openEditor(editorInput,
+					"com.bakesale.deejmixer.editors.MixEditor", true);
+		} catch (PartInitException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
-	
 	
 }

@@ -10,3 +10,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.bakesale.deejmixer,
+ com.bakesale.deejmixer.editors,
+ org.farng.mp3,
+ org.farng.mp3.filename,
+ org.farng.mp3.id3,
+ org.farng.mp3.lyrics3,
+ org.farng.mp3.object
+Bundle-ClassPath: lib/jid3lib-0.5.4.jar,
+ .
