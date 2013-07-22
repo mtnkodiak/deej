@@ -7,7 +7,8 @@ Bundle-Activator: com.bakesale.deejmixer.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
- org.eclipse.ui.editors
+ org.eclipse.ui.editors,
+ org.apache.commons.io;bundle-version="2.0.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: com.bakesale.deejmixer,
@@ -18,4 +19,5 @@ Export-Package: com.bakesale.deejmixer,
  org.farng.mp3.lyrics3,
  org.farng.mp3.object
 Bundle-ClassPath: lib/jid3lib-0.5.4.jar,
- .
+ .,
+ lib/

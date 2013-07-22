@@ -16,6 +16,7 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -70,8 +71,11 @@ public class View extends ViewPart {
 		      @Override
 		      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
 		          throws IOException {
-		        System.out.println(file);
-		        fileArray.add(file);
+		    	String fileExtension = FilenameUtils.getExtension(file.getFileName().toString());
+		    	if (fileExtension.equalsIgnoreCase("MP3")) {
+			        System.out.println(file);
+			        fileArray.add(file);		    		
+		    	}
 		        return FileVisitResult.CONTINUE;
 		      }
 		    };
@@ -89,13 +93,17 @@ public class View extends ViewPart {
 				try {
 					mp3File = new MP3File(path.toFile());
 				} catch (IOException | TagException e) {
-					System.out.println("trouble parsing " + path.toString());
-					e.printStackTrace();
+					System.out.println("trouble parsing " + path.toString() + ": " + e.getMessage());
+					//e.printStackTrace();
 					continue; //skip it!
 				}
 				mp3Files.add(mp3File);
 		    }
 
+		    System.out.println("returning the list of files: ");
+		    for (MP3File file : mp3Files) {
+		    	System.out.println("\t" + file.getMp3file().getName());
+		    }
 		    return mp3Files.toArray();
 			
 		}
@@ -105,37 +113,43 @@ public class View extends ViewPart {
 			ITableLabelProvider {
 		public String getColumnText(Object obj, int index) {
 			MP3File mp3File = (MP3File)obj;
+			String resultStr = null;
 			if (mp3File.hasID3v2Tag()) {
 				switch (index) {
 				case 0: //artist
-					return mp3File.getID3v2Tag().getLeadArtist();
+					System.out.println("getColumnText found '" + mp3File.getID3v2Tag().getLeadArtist() + "' for artist name (filename=" + mp3File.getMp3file().getName());
+					resultStr = mp3File.getID3v2Tag().getLeadArtist();
+					break;
 				case 1: //song title
-					return mp3File.getID3v2Tag().getSongTitle();
+					System.out.println("getColumnText found '" + mp3File.getID3v2Tag().getSongTitle() + "' for song name (filename=" + mp3File.getMp3file().getName());
+					resultStr = mp3File.getID3v2Tag().getSongTitle();
+					break;
 				case 2: //duration
-					File file = mp3File.getMp3file();
-					AudioFileFormat audioFileFormat = null;
-					try {
-						audioFileFormat = AudioSystem.getAudioFileFormat(file);
-					} catch (UnsupportedAudioFileException | IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						break;
-					}
-					// get all properties
-					Map<String, Object> properties = audioFileFormat.properties();
-					// duration is in microseconds
-					Long duration = (Long) properties.get("duration");
-
-					return duration.toString();
+//					File file = mp3File.getMp3file();
+//					AudioFileFormat audioFileFormat = null;
+//					try {
+//						audioFileFormat = AudioSystem.getAudioFileFormat(file);
+//					} catch (UnsupportedAudioFileException | IOException e) {
+//						System.out.println("OOPSIE on file " + file.getName() + ": " + e.getMessage());
+//						break;
+//					}
+//					// get all properties
+//					Map<String, Object> properties = audioFileFormat.properties();
+//					// duration is in microseconds
+//					Long duration = (Long) properties.get("duration");
+//
+//					return duration.toString();
+					break;
 				default:
-					return "UNKNOWN";
+					resultStr = "UNKNOWN";
 				}
 			} else  if (mp3File.hasID3v1Tag()){
-				return mp3File.getID3v1Tag().getArtist();
+				resultStr = mp3File.getID3v1Tag().getArtist();
 			} else {
-				return "WTF";
+				resultStr = "WTF - no mp3 tags at all!";
 			}
-			return ".";
+			
+			return resultStr;
 		}
 
 		public Image getColumnImage(Object obj, int index) {
