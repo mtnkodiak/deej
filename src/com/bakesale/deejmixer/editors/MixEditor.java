@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.TableColumn;
 public class MixEditor extends EditorPart {
 	private Table table;
 
+	public static String ID = "com.bakesale.deejmixer.mixeditor";
+	
 	/**
 	 * 
 	 */
@@ -52,6 +54,7 @@ public class MixEditor extends EditorPart {
 
 		setSite(site);
 		setInput(input);
+		
 	}
 
 	/* (non-Javadoc)
@@ -101,7 +104,8 @@ public class MixEditor extends EditorPart {
 		tblclmnCumulativeTime.setText("Cumulative Time");
 		scrolledComposite.setContent(table);
 		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
+		
+		
 	}
 
 	/* (non-Javadoc)

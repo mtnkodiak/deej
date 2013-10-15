@@ -23,7 +23,7 @@
          point="org.eclipse.ui.views">
       <view
             name="View"
-            class="com.bakesale.deejmixer.View"
+            class="com.bakesale.deejmixer.LibraryView"
             id="deejmixer.view">
       </view>
    </extension>

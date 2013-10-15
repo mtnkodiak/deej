@@ -1,6 +1,5 @@
 package com.bakesale.deejmixer;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -10,11 +9,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -23,6 +17,9 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -34,8 +31,8 @@ import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
 
 
-public class View extends ViewPart {
-	public View() {
+public class LibraryView extends ViewPart {
+	public LibraryView() {
 	}
 	public static final String ID = "deejmixer.view";
 
@@ -188,8 +185,14 @@ public class View extends ViewPart {
 		
 		viewer.setContentProvider(new ViewContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
+		
+		int operations = DND.DROP_COPY| DND.DROP_MOVE;
+	    Transfer[] transferTypes = new Transfer[]{TextTransfer.getInstance()};
+
+		viewer.addDragSupport(operations, transferTypes, new LibraryDragListener(viewer));
+		
 		// Provide the input to the ContentProvider
-		viewer.setInput(new String("One"));
+		viewer.setInput(new String("TOOTOO"));
 	}
 
 	/**
